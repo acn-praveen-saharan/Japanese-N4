@@ -1,0 +1,14 @@
+# Node.js
+node_modules/
+.env
+*.log
+.DS_Store
+npm-debug.log*
+
+# VS Code
+.vscode/
+.vs/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
