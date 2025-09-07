@@ -230,6 +230,78 @@ app.get('/api/grammar/:id', async (req, res) => {
   }
 });
 
+
+app.get('/api/grammar', async (req, res) => {
+  try {
+    let pool = await sql.connect(config);
+
+    const result = await pool.request().query(`
+      SELECT g.GrammarId, g.Concept, g.Meaning, g.Details,
+             e.ExampleId, e.Japanese, e.Romaji, e.English,
+             v.VocabId, v.Word, v.Romaji AS VocabRomaji, v.Meaning AS VocabMeaning
+      FROM GrammarPoints g
+      LEFT JOIN Examples e ON g.GrammarId = e.GrammarId
+      LEFT JOIN Vocabulary v ON e.ExampleId = v.ExampleId
+      ORDER BY g.GrammarId, e.ExampleId, v.VocabId
+    `);
+
+    if (result.recordset.length === 0) {
+      return res.json([]); // no grammar points
+    }
+
+    const rows = result.recordset;
+    const grammarMap = {};
+
+    for (const row of rows) {
+      // ✅ Ensure grammar object exists
+      if (!grammarMap[row.GrammarId]) {
+        grammarMap[row.GrammarId] = {
+          id: row.GrammarId,
+          concept: row.Concept,
+          meaning: row.Meaning,
+          details: row.Details,
+          examples: []
+        };
+      }
+
+      const grammar = grammarMap[row.GrammarId];
+
+      // ✅ Handle examples
+      if (row.ExampleId) {
+        let example = grammar.examples.find(ex => ex.id === row.ExampleId);
+        if (!example) {
+          example = {
+            id: row.ExampleId,
+            japanese: row.Japanese,
+            romaji: row.Romaji,
+            english: row.English,
+            vocab: []
+          };
+          grammar.examples.push(example);
+        }
+
+        // ✅ Handle vocab
+        if (row.VocabId) {
+          example.vocab.push({
+            word: row.Word,
+            romaji: row.VocabRomaji,
+            meaning: row.VocabMeaning
+          });
+        }
+      }
+    }
+
+    // return as array
+    res.json(Object.values(grammarMap));
+
+  } catch (err) {
+    console.error("Retrieve all error:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    sql.close();
+  }
+});
+
 app.get('/', (req, res) => {
   res.json({ message: 'こんにちは、N4学習者さん！ (Hello, N4 learner!)' });
 });
