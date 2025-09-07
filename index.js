@@ -228,6 +228,10 @@ app.get('/api/grammar/:id', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.json({ message: 'こんにちは、N4学習者さん！ (Hello, N4 learner!)' });
+});
+
 // Start server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
