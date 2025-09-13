@@ -230,6 +230,25 @@ app.get('/api/grammar/:id', async (req, res) => {
   }
 });
 
+// Fetch all kanji from DB
+app.get('/api/kanji', async (req, res) => {
+  try {
+    const pool = await sql.connect(config);
+
+    const result = await pool.request().query(`
+      SELECT Id, Kanji, Meanings, KunReadings, OnReadings, Grade, JLPT, StrokeCount, Unicode, HeisigEn, FreqMainichiShinbun
+      FROM KanjiInfo
+      ORDER BY Id
+    `);
+
+    res.json(result.recordset); // send results as JSON
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 app.get('/api/grammar', async (req, res) => {
   try {
