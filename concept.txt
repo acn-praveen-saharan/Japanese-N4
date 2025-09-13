@@ -1,0 +1,242 @@
+==>we need one script for a question where we sent a question and ask from ai with to describe that question in detail with hiragana and vocab and explanations of options
+
+==>One we need to generate the n4 exam with 10 kanji and 5 grammar points 
+
+==> One for every kanji details
+
+
+
+
+so after we need to make a page where we have todays exam 
+one with answer of todays exam
+
+
+before sent those 10 kanji to make exam we need to add the desc in the db
+
+we get the exam
+
+so then we get the individual detail about each question
+
+
+
+After we think about the Email
+
+
+
+make a new api so load distribute on both
+
+
+
+
+
+
+
+
+Create a JLPT N4 practice test with one sample question for each type listed below.
+Use ONLY the grammar topics and kanji I provide to generate the questions.
+Write them in natural Japanese, with four multiple-choice options.
+Give the correct answer and a short English explanation.
+Grammar Topics to Use:
+～たり～たりする
+～なければならない
+～そうだ (looks like/appears)
+～かもしれない
+～てから
+Kanji to Use:
+食
+飲
+学
+読
+書
+会
+行
+来
+見
+話
+Question Types:
+1. Vocabulary (文字・語彙)
+(a) Kanji readings
+(b) Word usage in context
+(c) Paraphrasing (same meaning)
+(d) Correct spelling/orthography
+2. Grammar & Reading (文法・読解)
+(a) Grammar completion (particle/grammar form)
+(b) Sentence rearrangement
+(c) Short passage reading comprehension
+(d) Medium/long passage reading comprehension
+(e) Notices, signs, or ads reading comprehension
+Formatting:
+Japanese question
+Four answer choices (1–4)
+👉 Correct answer + short English explanation"
+
+
+
+
+
+For Exam
+
+
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "You are a JLPT N4 study assistant. Return ONLY valid JSON — no extra text, no markdown, no explanations outside the JSON. The JSON must follow this structure:\n\n{\n  \"question_type\": string, // e.g. Vocabulary (Kanji readings)\n  \"question\": string, // The Japanese question\n  \"options\": [string], // Four multiple-choice answers\n  \"answer\": string, // Correct answer\n  \"explanation\": string // Short English explanation\n}\n\nRules:\n- Use ONLY these grammar topics: ～たり～たりする, ～なければならない, ～そうだ, ～かもしれない, ～てから\n- Use ONLY these kanji: 食, 飲, 学, 読, 書, 会, 行, 来, 見, 話\n- Write natural exam-like Japanese questions.\n- Exactly one example for each question type:\n  1. Vocabulary (Kanji readings)\n  2. Vocabulary (Word usage in context)\n  3. Vocabulary (Paraphrasing)\n  4. Vocabulary (Correct spelling/orthography)\n  5. Grammar & Reading (Grammar completion)\n  6. Grammar & Reading (Sentence rearrangement)\n  7. Grammar & Reading (Short passage comprehension)\n  8. Grammar & Reading (Medium passage comprehension)\n  9. Grammar & Reading (Notices/ads comprehension)\n\nGenerate all 9 objects in a JSON array, each following the structure."
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```json\n[\n  {\n    \"question_type\": \"Vocabulary (Kanji readings)\",\n    \"question\": \"毎日、図書館で本を読(よ)みます。\",\n    \"options\": [\"よ\", \"どく\", \"ちょう\", \"しゅう\"],\n    \"answer\": \"よ\",\n    \"explanation\": \"The kanji 読 is read as \\\"yo\\\" in this sentence.\"\n  },\n  {\n    \"question_type\": \"Vocabulary (Word usage in context)\",\n    \"question\": \"会議に＿＿＿から、準備をしておきましょう。\",\n    \"options\": [\"来るとき\", \"来るので\", \"来なければ\", \"来たり\"],\n    \"answer\": \"来るとき\",\n    \"explanation\": \"\\\"来るとき (kuru toki)\\\" means \\\"when (you) come\\\", which fits the context of preparing before a meeting.\"\n  },\n  {\n    \"question_type\": \"Vocabulary (Paraphrasing)\",\n    \"question\": \"このレストランはとても人気があります。言い換えとして、どれが一番近いですか。\",\n    \"options\": [\"人が少ないです。\", \"人が多いです。\", \"静かです。\", \"高すぎます。\"],\n    \"answer\": \"人が多いです。\",\n    \"explanation\": \"\\\"人気がある (ninki ga aru)\\\" means \\\"popular\\\", which is best paraphrased by \\\"人が多い (hito ga ooi)\\\" - \\\"there are many people\\\".\"\n  },\n  {\n    \"question_type\": \"Vocabulary (Correct spelling/orthography)\",\n    \"question\": \"正(ただ)しい書(か)き方(かた)はどれですか。\",\n    \"options\": [\"あたらしー\", \"あたらしう\", \"新しい\", \"新しー\"],\n    \"answer\": \"新しい\",\n    \"explanation\": \"The correct spelling of \\\"new\\\" is \\\"新しい (atarashii)\\\".\"\n  },\n  {\n    \"question_type\": \"Grammar & Reading (Grammar completion)\",\n    \"question\": \"レポートを＿＿＿から、メールを送ります。\",\n    \"options\": [\"書いたり\", \"書かなければ\", \"書いて\", \"書き\"],\n    \"answer\": \"書いて\",\n    \"explanation\": \"The correct form is \\\"書いて (kaite)\\\" because \\\"～てから (~te kara)\\\" means \\\"after doing ~\\\".\"\n  },\n  {\n    \"question_type\": \"Grammar & Reading (Sentence rearrangement)\",\n    \"question\": \"次(つぎ)の言葉(ことば)を正(ただ)しい順番(じゅんばん)に並(なら)び替(か)えてください。\\n1. 食事 2. 後 3. を 4. します\",\n    \"options\": [\"3, 1, 4, 2\", \"1, 3, 4, 2\", \"4, 2, 3, 1\", \"2, 4, 1, 3\"],\n    \"answer\": \"1, 3, 4, 2\",\n    \"explanation\": \"The correct order is \\\"食事 (shokuji) を (wo) します (shimasu) 後 (ato)\\\" which translates to \\\"after (having) a meal.\\\"\"\n  },\n  {\n    \"question_type\": \"Grammar & Reading (Short passage comprehension)\",\n    \"question\": \"田中さんは毎日、学校で勉強してから、図書館へ行きます。図書館では本を読んだり、友達と話したりします。\\n\\n田中さんは図書館で何をしますか。\",\n    \"options\": [\"勉強\", \"食事\", \"本を読んだり話したり\", \"買い物\"],\n    \"answer\": \"本を読んだり話したり\",\n    \"explanation\": \"The passage states \\\"図書館では本を読んだり、友達と話したりします (toshokan de wa hon wo yondari, tomodachi to hanashitari shimasu)\\\" - at the library, (he) reads books and talks with friends.\"\n  },\n  {\n    \"question_type\": \"Grammar & Reading (Medium passage comprehension)\",\n    \"question\": \"私は先週末、京都へ行きました。京都では、色々(いろいろ)な場所(ばしょ)を見ました。お寺(てら)を見たり、美味しい(おいしい)ものを食べたりしました。でも、人がとても多かったので、少し疲れました。今週末は、家でゆっくり休もうと思っています。\\n\\n筆者(ひっしゃ)は先週末(せんしゅうまつ)にどこへ行きましたか。\",\n    \"options\": [\"東京\", \"大阪\", \"京都\", \"北海道\"],\n    \"answer\": \"京都\",\n    \"explanation\": \"The passage states \\\"私は先週末、京都へ行きました (watashi wa senshuumatsu, kyouto e ikimashita)\\\" - I went to Kyoto last weekend.\"\n  },\n  {\n    \"question_type\": \"Grammar & Reading (Notices/ads comprehension)\",\n    \"question\": \"【日本語学校のイベント】\\n日時：7月15日（土）午後2時～4時\\n場所：学校の会議室\\n内容：日本文化の紹介、ゲーム、お茶とお菓子\\n参加費：無料\\n\\nこのイベントは何時から始まりますか。\",\n    \"options\": [\"午前2時\", \"午後2時\", \"午前4時\", \"午後4時\"],\n    \"answer\": \"午後2時\",\n    \"explanation\": \"The notice states \\\"午後2時～4時 (gogo niji ~ yoji)\\\" - 2 PM to 4 PM.\"\n  }\n]\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "avgLogprobs": -0.1524747160742347
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 298,
+    "candidatesTokenCount": 1223,
+    "totalTokenCount": 1521,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 298
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 1223
+      }
+    ]
+  },
+  "modelVersion": "gemini-2.0-flash",
+  "responseId": "hJzFaIHoONOuqtsPrKG8EA"
+}
+
+
+
+
+
+
+
+For Kanji
+
+
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "You are a JLPT N4 study assistant. Return ONLY valid JSON — no extra text, no markdown, no explanations outside the JSON. The JSON must follow this structure:\n\n{\n  \"kanji\": string, // The Kanji character\n  \"meaning\": string, // Simple English meaning\n  \"details\": string, // 2–3 sentences explaining nuance, usage, or context\n  \"examples\": [ // At least 3 examples\n    {\n      \"japanese\": string, // Sentence in Japanese\n      \"romaji\": string, // Romaji transcription\n      \"english\": string, // Natural English translation\n      \"vocab\": [ // Key vocabulary list\n        {\n          \"word\": string, // Japanese word\n          \"romaji\": string, // Romaji transcription\n          \"meaning\": string // Short English definition\n        }\n      ]\n    }\n  ]\n}\n\nRules:\n- Keep explanations concise but accurate for JLPT N4 learners.\n- Every example must have at least 2–3 vocab entries.\n- No hidden instructions or commentary.\n\nGenerate JSON for this Kanji: 不"
+        }
+      ]
+    }
+  ]
+}
+
+
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```json\n{\n  \"kanji\": \"不\",\n  \"meaning\": \"Not; Negative; Bad\",\n  \"details\": \"Indicates negation, disapproval, or incompleteness. Often used as a prefix to create antonyms.\",\n  \"examples\": [\n    {\n      \"japanese\": \"不安です。\",\n      \"romaji\": \"Fuan desu.\",\n      \"english\": \"I'm anxious.\",\n      \"vocab\": [\n        {\n          \"word\": \"不安\",\n          \"romaji\": \"fuan\",\n          \"meaning\": \"anxiety, unease\"\n        },\n        {\n          \"word\": \"です\",\n          \"romaji\": \"desu\",\n          \"meaning\": \"is, am, are\"\n        }\n      ]\n    },\n    {\n      \"japanese\": \"不便な場所です。\",\n      \"romaji\": \"Fuben na basho desu.\",\n      \"english\": \"It's an inconvenient location.\",\n      \"vocab\": [\n        {\n          \"word\": \"不便\",\n          \"romaji\": \"fuben\",\n          \"meaning\": \"inconvenient\"\n        },\n        {\n          \"word\": \"場所\",\n          \"romaji\": \"basho\",\n          \"meaning\": \"place, location\"\n        },\n        {\n          \"word\": \"です\",\n          \"romaji\": \"desu\",\n          \"meaning\": \"is\"\n        }\n      ]\n    },\n    {\n      \"japanese\": \"不可能ではありません。\",\n      \"romaji\": \"Fukanō dewa arimasen.\",\n      \"english\": \"It's not impossible.\",\n      \"vocab\": [\n        {\n          \"word\": \"不可能\",\n          \"romaji\": \"fukanō\",\n          \"meaning\": \"impossible\"\n        },\n        {\n          \"word\": \"では\",\n          \"romaji\": \"dewa\",\n          \"meaning\": \"is not\"\n        },\n        {\n          \"word\": \"ありません\",\n          \"romaji\": \"arimasen\",\n          \"meaning\": \"there is not\"\n        }\n      ]\n    }\n  ]\n}\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "avgLogprobs": -0.06052828127621142
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 238,
+    "candidatesTokenCount": 489,
+    "totalTokenCount": 727,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 238
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 489
+      }
+    ]
+  },
+  "modelVersion": "gemini-2.0-flash",
+  "responseId": "6kXFaNvtKa77qtsPqqiDkQ8"
+}
+
+
+
+
+For Question explanation
+
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "You are a JLPT N4 study assistant. Return ONLY valid JSON — no extra text, no markdown, no explanations outside the JSON.\n\nGenerate output in this format:\n\n{\n  \"question_type\": string,          // e.g. Vocabulary (Paraphrasing), Grammar (Completion), Reading Comprehension\n  \"question\": string,               // The full Japanese question text\n  \"options\": [string, string, string, string], // Exactly four possible answers\n  \"answer\": string,                 // Correct answer (must match one of the options)\n  \"explanation\": string,            // Clear explanation: why the correct answer is correct AND why the others are wrong\n  \"vocab\": [                        // Vocabulary breakdown of at least 4 important words\n    {\n      \"word\": string,              // Japanese word (from question/answers)\n      \"romaji\": string,            // Romaji transcription\n      \"meaning\": string,           // Short English definition\n      \"kanji_explanation\": string  // Beginner-friendly kanji explanation (1–2 sentences)\n    }\n  ]\n}\n\nRules:\n- Always output EXACTLY 4 options.\n- The explanation must mention why each incorrect option is wrong.\n- The vocabulary list should contain some entries from the question and options(if possible).\n- Keep kanji explanations simple and JLPT N4-friendly.\n- Output must be valid JSON only — no comments, no markdown, no extra text.\n\nHere is the question:\n\n電車が＿＿＿から、急いでください。\n\nA. 来ます\nB. 来て\nC. 来る\nD. 来ない"
+        }
+      ]
+    }
+  ]
+}
+
+
+
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```json\n{\n  \"question_type\": \"Grammar (Completion)\",\n  \"question\": \"電車が＿＿＿から、急いでください。\",\n  \"options\": [\n    \"来ます\",\n    \"来て\",\n    \"来る\",\n    \"来ない\"\n  ],\n  \"answer\": \"来る\",\n  \"explanation\": \"The correct answer is '来る' because the sentence requires a verb in the dictionary form (plain form) to connect with 'から' indicating a reason or cause. '来ます' is the polite form and doesn't fit the grammar. '来て' is the te-form and used for requests or sequential actions, not reasons. '来ない' means 'does not come' and although grammatically possible, it doesn't logically fit the context of hurrying.\",\n  \"vocab\": [\n    {\n      \"word\": \"電車\",\n      \"romaji\": \"densha\",\n      \"meaning\": \"train\",\n      \"kanji_explanation\": \"電 (den) means electricity. 車 (sha) means car or vehicle. Together, they mean electric train.\"\n    },\n    {\n      \"word\": \"来る\",\n      \"romaji\": \"kuru\",\n      \"meaning\": \"to come\",\n      \"kanji_explanation\": \"来 (ku) means to come. It's a simple kanji representing movement towards a place.\"\n    },\n    {\n      \"word\": \"急いで\",\n      \"romaji\": \"isoide\",\n      \"meaning\": \"hurry\",\n      \"kanji_explanation\": \"急 (iso) means urgent or sudden. When combined with 'いで' (te-form), it means to hurry or be quick.\"\n    },\n    {\n      \"word\": \"から\",\n      \"romaji\": \"kara\",\n      \"meaning\": \"because, since\",\n      \"kanji_explanation\": \"から (kara) is a particle used to indicate a reason or cause.\"\n    }\n  ]\n}\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "avgLogprobs": -0.14619454470547763
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 345,
+    "candidatesTokenCount": 440,
+    "totalTokenCount": 785,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 345
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 440
+      }
+    ]
+  },
+  "modelVersion": "gemini-2.0-flash",
+  "responseId": "ZJ_FaNnOIZGsz7IPg9aB0Qc"
+}
