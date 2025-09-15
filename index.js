@@ -381,6 +381,86 @@ app.get('/api/grammar', async (req, res) => {
   }
 });
 
+
+
+app.get('/api/exam/today', async (req, res) => {
+  let pool;
+  try {
+    pool = await sql.connect(config);
+
+    // 1. Get the latest batch created today
+    const batchResult = await pool.request().query(`
+      SELECT TOP 1 batch_id, created_at, grammar_list, kanji_list
+      FROM QuestionBatch
+      WHERE CAST(created_at AS DATE) = CAST(GETDATE() AS DATE)
+      ORDER BY created_at DESC;
+    `);
+
+    if (batchResult.recordset.length === 0) {
+      return res.status(404).json({ message: 'No exam found for today' });
+    }
+
+    const batch = batchResult.recordset[0];
+
+    // 2. Get all questions + options for this batch
+    const questionsResult = await pool.request()
+      .input('batch_id', sql.Int, batch.batch_id)
+      .query(`
+        SELECT 
+          q.question_id,
+          q.question_type,
+          q.question_text,
+          q.answer,
+          q.explanation,
+          qo.option_id,
+          qo.option_text,
+          qo.is_correct
+        FROM questions q
+        JOIN question_options qo ON q.question_id = qo.question_id
+        WHERE q.batch_id = @batch_id
+        ORDER BY q.question_id, qo.option_id;
+      `);
+
+    // 3. Group options under each question
+    const questionsMap = {};
+    for (const row of questionsResult.recordset) {
+      if (!questionsMap[row.question_id]) {
+        questionsMap[row.question_id] = {
+          question_id: row.question_id,
+          question_type: row.question_type,
+          question_text: row.question_text,
+          answer: row.answer,
+          explanation: row.explanation,
+          options: [],
+        };
+      }
+      questionsMap[row.question_id].options.push({
+        option_id: row.option_id,
+        option_text: row.option_text,
+        is_correct: row.is_correct,
+      });
+    }
+
+    const questions = Object.values(questionsMap);
+
+    // 4. Send response
+    res.json({
+      batch_id: batch.batch_id,
+      created_at: batch.created_at,
+      grammar_list: JSON.parse(batch.grammar_list),
+      kanji_list: JSON.parse(batch.kanji_list),
+      questions,
+    });
+  } catch (err) {
+    console.error('❌ Get today exam error:', err.message);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (pool) await pool.close();
+  }
+});
+
+
+
 app.get('/', (req, res) => {
   res.json({ message: 'こんにちは、N4学習者さん！ (Hello, N4 learner!)' });
 });
