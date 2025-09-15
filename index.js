@@ -248,6 +248,66 @@ app.get('/api/kanji', async (req, res) => {
   }
 });
 
+app.get('/api/kanji/:id', async (req, res) => {
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const kanjiId = parseInt(req.params.id, 10);
+
+    // 1. Fetch the Kanji itself
+    const kanjiResult = await pool.request()
+      .input('id', sql.Int, kanjiId)
+      .query(`
+        SELECT *
+        FROM KanjiInfo
+        WHERE Id = @id
+      `);
+
+    if (kanjiResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Kanji not found' });
+    }
+
+    const kanji = kanjiResult.recordset[0];
+
+    // 2. Fetch all examples for this Kanji
+    const examplesResult = await pool.request()
+      .input('id', sql.Int, kanjiId)
+      .query(`
+        SELECT *
+        FROM KanjiExamples
+        WHERE KanjiId = @id
+      `);
+
+    const examples = [];
+
+    // 3. For each example, fetch its vocab
+    for (const ex of examplesResult.recordset) {
+      const vocabResult = await pool.request()
+        .input('exampleId', sql.Int, ex.ExampleId)
+        .query(`
+          SELECT *
+          FROM KanjiExampleVocabulary
+          WHERE ExampleId = @exampleId
+        `);
+
+      examples.push({
+        ...ex,
+        vocab: vocabResult.recordset,
+      });
+    }
+
+    // 4. Return everything together
+    res.json({
+      ...kanji,
+      examples,
+    });
+
+  } catch (err) {
+    console.error('❌ Error fetching kanji details:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 
 app.get('/api/grammar', async (req, res) => {

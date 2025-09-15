@@ -1,0 +1,139 @@
+async function updateKanji(kanji) {
+  const pool = await sql.connect(dbConfig);
+
+  // Step 1: Get Kanji ID
+  const kanjiRow = await pool
+    .request()
+    .input('kanji', sql.NVarChar, kanji)
+    .query('SELECT Id FROM KanjiInfo WHERE Kanji = @kanji');
+
+  if (kanjiRow.recordset.length === 0) {
+    throw new Error(`Kanji ${kanji} not found in KanjiInfo`);
+  }
+  const kanjiId = kanjiRow.recordset[0].Id;
+
+  // Step 2: Call Gemini API for Kanji
+  const geminiBody = {
+    contents: [
+      {
+        parts: [
+          {
+            text: `You are a JLPT N4 study assistant. Return ONLY valid JSON — no extra text.
+JSON format:
+{
+  "kanji": string,
+  "meaning": string,
+  "details": string,
+  "examples": [
+    {
+      "japanese": string,
+      "romaji": string,
+      "english": string,
+      "vocab": [
+        { "word": string, "romaji": string, "meaning": string }
+      ]
+    }
+  ]
+}
+Rules:
+- Keep explanations concise but accurate for JLPT N4 learners.
+- Every example must have at least 2–3 vocab entries.
+- No hidden instructions or commentary.
+Generate JSON for this Kanji: ${kanji}`,
+          },
+        ],
+      },
+    ],
+  };
+
+  const response = await axios.post(
+    `${GEMINI_API_URL}?key=${GEMINI_KEY}`,
+    geminiBody,
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+
+  let jsonText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text.trim();
+  if (!jsonText) throw new Error('Invalid Gemini response format');
+
+  if (jsonText.startsWith('```json')) {
+    jsonText = jsonText.replace(/^```json/, '').replace(/```$/, '').trim();
+  }
+
+  const data = JSON.parse(jsonText);
+
+  // Step 3: Update KanjiInfo
+  await pool
+    .request()
+    .input('meaning2', sql.NVarChar, data.meaning)
+    .input('details', sql.NVarChar, data.details)
+    .input('id', sql.Int, kanjiId)
+    .query(
+      'UPDATE KanjiInfo SET Meaning2 = @meaning2, Details = @details WHERE Id = @id'
+    );
+
+  // Step 4: Insert Examples + Vocab
+  for (const ex of data.examples) {
+    const exampleResult = await pool
+      .request()
+      .input('kanjiId', sql.Int, kanjiId)
+      .input('japanese', sql.NVarChar, ex.japanese)
+      .input('romaji', sql.NVarChar, ex.romaji)
+      .input('english', sql.NVarChar, ex.english)
+      .query(
+        `INSERT INTO KanjiExamples (KanjiId, Japanese, Romaji, English)
+         OUTPUT INSERTED.ExampleId
+         VALUES (@kanjiId, @japanese, @romaji, @english)`
+      );
+
+    const exampleId = exampleResult.recordset[0].ExampleId;
+
+    for (const v of ex.vocab) {
+      await pool
+        .request()
+        .input('exampleId', sql.Int, exampleId)
+        .input('word', sql.NVarChar, v.word)
+        .input('romaji', sql.NVarChar, v.romaji)
+        .input('meaning', sql.NVarChar, v.meaning)
+        .query(
+          `INSERT INTO KanjiExampleVocabulary (ExampleId, Word, Romaji, Meaning)
+           VALUES (@exampleId, @word, @romaji, @meaning)`
+        );
+    }
+  }
+
+  console.log(`✅ Kanji ${kanji} updated with details, examples, and vocab.`);
+  await pool.close();
+}
+
+
+async function updateAllKanji() {
+  const pool = await sql.connect(dbConfig);
+
+  try {
+    // Fetch all Kanji missing Meaning2 or Details
+    const result = await pool.request().query(`
+      SELECT Kanji
+      FROM KanjiInfo
+      WHERE Meaning2 IS NULL OR Details IS NULL
+    `);
+
+    const kanjiList = result.recordset.map((row) => row.Kanji);
+
+    console.log(`🔍 Found ${kanjiList.length} kanji to update.`);
+
+    // Update each Kanji one by one
+    for (const k of kanjiList) {
+      try {
+        await updateKanji(k);
+        // Sleep a little between requests to avoid rate limiting
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      } catch (err) {
+        console.error(`❌ Failed to update kanji ${k}:`, err.message);
+      }
+    }
+
+    console.log(`🎉 Finished updating ${kanjiList.length} kanji.`);
+  } finally {
+    await pool.close();
+  }
+}
