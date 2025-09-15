@@ -250,7 +250,7 @@ app.get('/api/kanji', async (req, res) => {
 
 app.get('/api/kanji/:id', async (req, res) => {
   try {
-    const pool = await sql.connect(dbConfig);
+    const pool = await sql.connect(config);
 
     const kanjiId = parseInt(req.params.id, 10);
 
