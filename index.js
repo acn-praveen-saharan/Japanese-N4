@@ -392,7 +392,6 @@ app.get('/api/exam/today', async (req, res) => {
     const batchResult = await pool.request().query(`
       SELECT TOP 1 batch_id, created_at, grammar_list, kanji_list
       FROM QuestionBatch
-      WHERE CAST(created_at AS DATE) = CAST(GETDATE() AS DATE)
       ORDER BY created_at DESC;
     `);
 

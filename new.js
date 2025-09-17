@@ -206,7 +206,7 @@ Generate 9 questions in an array with this structure:
   "question": string,
   "options": [string],
   "answer": string,
-  "explanation": string
+  "explanation": string(english)
 }
 
 Rules:
